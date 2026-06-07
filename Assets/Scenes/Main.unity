@@ -210,6 +210,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
+  - component: {fileID: 330585548}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -335,6 +336,22 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &330585548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c49b4cc203aa6414fae5c798d1d0e7d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.PhysicsRaycaster
+  m_EventMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_MaxRayIntersections: 0
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -901,7 +918,7 @@ MonoBehaviour:
     \"whyThisFive\": \"Representa a estrutura pr\xE1tica da contribui\xE7\xE3o central,
     mostrando como os m\xF3dulos interagem para alcan\xE7ar o objetivo da anima\xE7\xE3o
     facial din\xE2mica.\",\r\n      \"relatedImage\": \"fig1_architecture.png\",\r\n     
-    \"displayType\": \"image\"\r\n    },\r\n    {\r\n      \"suggestedName\": \"TextoProblemaAnimacao\",\r\n     
+    \"displayType\": \"graph\"\r\n    },\r\n    {\r\n      \"suggestedName\": \"TextoProblemaAnimacao\",\r\n     
     \"conceptualOrigin\": \"O problema fundamental da anima\xE7\xE3o emocional din\xE2mica
     em jogos\",\r\n      \"category\": \"problem\",\r\n      \"visualMetaphor\":
     \"Texto: 'A dificuldade em gerar respostas emocionais complexas e din\xE2micas
@@ -937,12 +954,13 @@ MonoBehaviour:
     linha com a m\xE9dia geral destacada\",\r\n      \"interactionType\": \"observa\",\r\n     
     \"whyThisFive\": \"\xC9 o principal crit\xE9rio de sucesso para o sistema, indicando
     a qualidade percebida das anima\xE7\xF5es e seu alinhamento com a realidade emocional.\",\r\n     
-    \"relatedImage\": \"null\",\r\n      \"displayType\": \"table\"\r\n    }\r\n 
-    ],\r\n  \"objectScores\": [\r\n    {\r\n      \"suggestedName\": \"ArquiteturaRAGAnimacaoFacial\",\r\n     
-    \"score\": 0.95,\r\n      \"confidence\": \"high\",\r\n      \"feedback\": \"\"\r\n   
-    },\r\n    {\r\n      \"suggestedName\": \"TextoProblemaAnimacao\",\r\n      \"score\":
-    0.85,\r\n      \"confidence\": \"high\",\r\n      \"feedback\": \"\"\r\n    },\r\n   
-    {\r\n      \"suggestedName\": \"TextoAnimatorAgent\",\r\n      \"score\": 0.9,\r\n     
+    \"relatedImage\": \"null\",\r\n      \"displayType\": \"table\",\r\n      \"rows\":
+    4,\r\n      \"columns\": 3\r\n    }\r\n  ],\r\n  \"objectScores\": [\r\n    {\r\n     
+    \"suggestedName\": \"ArquiteturaRAGAnimacaoFacial\",\r\n      \"score\": 0.95,\r\n     
+    \"confidence\": \"high\",\r\n      \"feedback\": \"\"\r\n    },\r\n    {\r\n     
+    \"suggestedName\": \"TextoProblemaAnimacao\",\r\n      \"score\": 0.85,\r\n     
+    \"confidence\": \"high\",\r\n      \"feedback\": \"\"\r\n    },\r\n    {\r\n     
+    \"suggestedName\": \"TextoAnimatorAgent\",\r\n      \"score\": 0.9,\r\n     
     \"confidence\": \"high\",\r\n      \"feedback\": \"\"\r\n    },\r\n    {\r\n     
     \"suggestedName\": \"ExemplosExpressoesGeradas\",\r\n      \"score\": 0.95,\r\n     
     \"confidence\": \"high\",\r\n      \"feedback\": \"\"\r\n    },\r\n    {\r\n     

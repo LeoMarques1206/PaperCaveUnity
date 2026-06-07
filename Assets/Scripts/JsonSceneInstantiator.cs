@@ -16,6 +16,10 @@ public class GameObjectData
 
     public string relatedImage;
     public string displayType;
+    public int rows;
+    public int columns;
+    public string tableHeaders;  // separado por "|"
+    public string tableRows;     // linhas separadas por ";", colunas por "|"
 }
 
 [System.Serializable]
@@ -63,7 +67,7 @@ public class JsonSceneInstantiator : MonoBehaviour
 
     private readonly List<GameObject> _spawnedObjects = new();
 
-    [ContextMenu("Instanciar da JSON")]
+[ContextMenu("Instanciar da JSON")]
     public void InstantiateFromJson()
     {
         ClearSpawned();
@@ -75,7 +79,6 @@ public class JsonSceneInstantiator : MonoBehaviour
         }
 
         SceneData data;
-
         try
         {
             data = JsonUtility.FromJson<SceneData>(jsonInput);
@@ -92,165 +95,145 @@ public class JsonSceneInstantiator : MonoBehaviour
             return;
         }
 
-        //----------------------------------
         // TÍTULO
-        //----------------------------------
-
         if (prefabTitle != null)
         {
-            Vector3 titlePos =
-                anchorTitle != null
-                    ? anchorTitle.position
-                    : Vector3.zero;
-
-            GameObject titleInstance =
-                Instantiate(
-                    prefabTitle,
-                    titlePos,
-                    Quaternion.identity);
-
+            Vector3 titlePos = anchorTitle != null ? anchorTitle.position : Vector3.zero;
+            GameObject titleInstance = Instantiate(prefabTitle, titlePos, Quaternion.identity);
             titleInstance.name = "Title";
 
-            TMP_Text tmp =
-                titleInstance.GetComponent<TMP_Text>();
-
-            if (tmp == null)
-                tmp = titleInstance.GetComponentInChildren<TMP_Text>(true);
-
-            if (tmp != null)
-            {
-                tmp.text = data.paperTitle;
-            }
-            else
-            {
-                Debug.LogWarning(
-                    "[JsonSceneInstantiator] prefabTitle não possui TMP_Text.");
-            }
+            TMP_Text tmp = titleInstance.GetComponent<TMP_Text>();
+            if (tmp == null) tmp = titleInstance.GetComponentInChildren<TMP_Text>(true);
+            if (tmp != null) tmp.text = data.paperTitle;
+            else Debug.LogWarning("[JsonSceneInstantiator] prefabTitle não possui TMP_Text.");
 
             _spawnedObjects.Add(titleInstance);
-
-            Debug.Log(
-                $"[JsonSceneInstantiator] ✔ Título instanciado: {data.paperTitle}");
+            Debug.Log($"[JsonSceneInstantiator] ✔ Título: {data.paperTitle}");
         }
 
-        //----------------------------------
-        // GAME OBJECTS
-        //----------------------------------
-
-        if (data.gameObjects == null ||
-            data.gameObjects.Count == 0)
+        if (data.gameObjects == null || data.gameObjects.Count == 0)
         {
-            Debug.LogWarning(
-                "[JsonSceneInstantiator] Nenhum gameObject encontrado.");
+            Debug.LogWarning("[JsonSceneInstantiator] Nenhum gameObject encontrado.");
             return;
         }
 
-        Debug.Log(
-            $"[JsonSceneInstantiator] Instanciando {data.gameObjects.Count} objetos...");
+        Debug.Log($"[JsonSceneInstantiator] Instanciando {data.gameObjects.Count} objetos...");
 
         for (int i = 0; i < data.gameObjects.Count; i++)
         {
-            GameObjectData goData =
-                data.gameObjects[i];
-
-            GameObject prefab =
-                GetPrefabForDisplayType(goData.displayType);
+            GameObjectData goData = data.gameObjects[i];
+            GameObject prefab = GetPrefabForDisplayType(goData.displayType);
 
             if (prefab == null)
             {
-                Debug.LogWarning(
-                    $"[JsonSceneInstantiator] Nenhum prefab encontrado para displayType '{goData.displayType}'.");
+                Debug.LogWarning($"[JsonSceneInstantiator] Prefab não encontrado para displayType '{goData.displayType}'.");
                 continue;
             }
 
-            if (anchorSlots == null ||
-                i >= anchorSlots.Length ||
-                anchorSlots[i] == null)
+            if (anchorSlots == null || i >= anchorSlots.Length || anchorSlots[i] == null)
             {
-                Debug.LogWarning(
-                    $"[JsonSceneInstantiator] Âncora [{i}] não configurada.");
+                Debug.LogWarning($"[JsonSceneInstantiator] Âncora [{i}] não configurada.");
                 continue;
             }
 
-            Vector3 position =
-                anchorSlots[i].position;
+            Vector3 position = anchorSlots[i].position;
+            GameObject instance = Instantiate(prefab, position, Quaternion.identity);
+            instance.name = goData.suggestedName;
 
-            GameObject instance =
-                Instantiate(
-                    prefab,
-                    position,
-                    Quaternion.identity);
-
-            instance.name =
-                goData.suggestedName;
-
-            //----------------------------------
             // TEXTO AUTOMÁTICO
-            //----------------------------------
             if (goData.displayType?.ToLower() == "text")
             {
                 string textContent = goData.visualMetaphor ?? "";
-
-                // Remove "Texto: " (7 caracteres)
-                if (textContent.Length > 7)
-                {
-                    textContent = textContent.Substring(7);
-                }
-
-                // Remove aspas extras caso existam
+                if (textContent.Length > 7) textContent = textContent.Substring(7);
                 textContent = textContent.Trim().Trim('"', '\'');
 
-                TMP_Text[] texts =
-                    instance.GetComponentsInChildren<TMP_Text>(true);
-
-                foreach (TMP_Text text in texts)
-                {
-                    text.text = textContent;
-                }
+                TMP_Text[] texts = instance.GetComponentsInChildren<TMP_Text>(true);
+                foreach (TMP_Text text in texts) text.text = textContent;
             }
 
-            //----------------------------------
+            // TABELA DINÂMICA
+            if (goData.displayType?.ToLower() == "table")
+            {
+                TableBuilder builder = instance.GetComponent<TableBuilder>();
+                if (builder == null) builder = instance.AddComponent<TableBuilder>();
+
+                // Resolve rows/columns (usa valores do JSON ou fallback)
+                int rows    = goData.rows    > 0 ? goData.rows    : 3;
+                int columns = goData.columns > 0 ? goData.columns : 3;
+
+                // Headers
+                List<string> headers = new List<string>();
+                if (!string.IsNullOrEmpty(goData.tableHeaders))
+                {
+                    foreach (var h in goData.tableHeaders.Split('|'))
+                        headers.Add(h.Trim());
+                }
+                else
+                {
+                    for (int c = 0; c < columns; c++)
+                        headers.Add($"Coluna {c + 1}");
+                }
+
+                // Dados das linhas
+                List<List<string>> rowData = new List<List<string>>();
+                if (!string.IsNullOrEmpty(goData.tableRows))
+                {
+                    foreach (var rowStr in goData.tableRows.Split(';'))
+                    {
+                        var cells = new List<string>();
+                        foreach (var cell in rowStr.Split('|'))
+                            cells.Add(cell.Trim());
+                        rowData.Add(cells);
+                    }
+                }
+                else
+                {
+                    // Gera dados fictícios
+                    string[] fakeFirstCol  = { "Raiva", "Alegria", "Tristeza", "Surpresa", "Medo", "Nojo", "Neutro" };
+                    string[] fakeSecondCol = { "2.80", "3.40", "2.60", "3.10", "2.90", "2.70", "3.50" };
+                    string[] fakeThirdCol  = { "Alta", "Alta", "Média", "Alta", "Média", "Baixa", "Alta" };
+                    string[] fakeFourthCol = { "12", "18", "9", "15", "11", "7", "20" };
+
+                    for (int r = 0; r < rows; r++)
+                    {
+                        var cells = new List<string>();
+                        for (int c = 0; c < columns; c++)
+                        {
+                            string val = c switch
+                            {
+                                0 => r < fakeFirstCol.Length  ? fakeFirstCol[r]  : $"Item {r+1}",
+                                1 => r < fakeSecondCol.Length ? fakeSecondCol[r] : $"{Random.Range(1.0f,5.0f):F2}",
+                                2 => r < fakeThirdCol.Length  ? fakeThirdCol[r]  : $"Val {r+1}",
+                                3 => r < fakeFourthCol.Length ? fakeFourthCol[r] : $"{Random.Range(1,30)}",
+                                _ => $"—"
+                            };
+                            cells.Add(val);
+                        }
+                        rowData.Add(cells);
+                    }
+                }
+
+                builder.Build(rows, columns, headers, rowData);
+                Debug.Log($"[JsonSceneInstantiator] ✔ Tabela '{instance.name}' construída ({rows}x{columns}).");
+            }
+
             // METADADOS
-            //----------------------------------
-
-            GameObjectMeta meta =
-                instance.GetComponent<GameObjectMeta>();
-
-            if (meta == null)
-                meta = instance.AddComponent<GameObjectMeta>();
-
-            meta.suggestedName =
-                goData.suggestedName;
-
-            meta.type =
-                goData.displayType;
-
-            meta.conceptualOrigin =
-                goData.conceptualOrigin;
-
-            meta.category =
-                goData.category;
-
-            meta.visualMetaphor =
-                goData.visualMetaphor;
-
-            meta.behaviourHint =
-                goData.behaviourHint;
-
-            meta.interactionType =
-                goData.interactionType;
-
-            meta.whyThisFive =
-                goData.whyThisFive;
+            GameObjectMeta meta = instance.GetComponent<GameObjectMeta>();
+            if (meta == null) meta = instance.AddComponent<GameObjectMeta>();
+            meta.suggestedName   = goData.suggestedName;
+            meta.type            = goData.displayType;
+            meta.conceptualOrigin = goData.conceptualOrigin;
+            meta.category        = goData.category;
+            meta.visualMetaphor  = goData.visualMetaphor;
+            meta.behaviourHint   = goData.behaviourHint;
+            meta.interactionType = goData.interactionType;
+            meta.whyThisFive     = goData.whyThisFive;
 
             _spawnedObjects.Add(instance);
-
-            Debug.Log(
-                $"[JsonSceneInstantiator] ✔ '{instance.name}' ({goData.displayType}) instanciado.");
+            Debug.Log($"[JsonSceneInstantiator] ✔ '{instance.name}' ({goData.displayType}) instanciado.");
         }
 
-        Debug.Log(
-            $"[JsonSceneInstantiator] Finalizado. {_spawnedObjects.Count} objeto(s) criados.");
+        Debug.Log($"[JsonSceneInstantiator] Finalizado. {_spawnedObjects.Count} objeto(s) criados.");
     }
 
     [ContextMenu("Limpar Objetos Instanciados")]
