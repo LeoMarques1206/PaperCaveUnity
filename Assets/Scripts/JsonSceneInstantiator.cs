@@ -217,6 +217,16 @@ public class JsonSceneInstantiator : MonoBehaviour
                 Debug.Log($"[JsonSceneInstantiator] ✔ Tabela '{instance.name}' construída ({rows}x{columns}).");
             }
 
+            // GRÁFICO DE BARRAS
+            if (goData.displayType?.ToLower() == "graph" ||
+                goData.displayType?.ToLower() == "chart")
+            {
+                BarChartBuilder chartBuilder = instance.GetComponent<BarChartBuilder>();
+                if (chartBuilder == null) chartBuilder = instance.AddComponent<BarChartBuilder>();
+                chartBuilder.Build();
+                Debug.Log($"[JsonSceneInstantiator] ✔ Gráfico '{instance.name}' construído.");
+            }
+
             // METADADOS
             GameObjectMeta meta = instance.GetComponent<GameObjectMeta>();
             if (meta == null) meta = instance.AddComponent<GameObjectMeta>();

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4418975430246847232}
   - component: {fileID: 4164394684423410498}
   - component: {fileID: 7652810931936125546}
+  - component: {fileID: 1859229581293306731}
   m_Layer: 5
   m_Name: Grafico2
   m_TagString: Untagged
@@ -66,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: d8edec5a15db4eb4e84d528b805640c7, type: 3}
+  m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -100,3 +101,15 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!114 &1859229581293306731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8563177744118914522}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 679779ffd91a25f478d4b035ad16fd11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BarChartBuilder
